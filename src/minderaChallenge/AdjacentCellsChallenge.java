@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
 
 public class AdjacentCellsChallenge {
 	
@@ -13,16 +16,25 @@ public class AdjacentCellsChallenge {
 	private static Integer[] coordinates = new Integer[2];
 	private static ArrayList<Integer[]> exploredCells = new ArrayList<Integer[]>();
 	private static ArrayList<ArrayList<Integer[]>> groups = new ArrayList<ArrayList<Integer[]>>();
-	private static boolean exploring = false;
-	
-	
+	static Scanner reader = new Scanner(System.in);
+	static String answer_one = null;
+	static String answer_two = null;
 
 	public static void main(String[] args) {
+		
+		System.out.println("Want to print has it finds groups? (y/n)");
+		
+		try {
+			answer_one = reader.next();
+        } catch(InputMismatchException e) {
+        	System.out.println("Invalid input! So it will not be printed");
+        	answer_one = "N";
+        }
 		
 		long startTime = System.currentTimeMillis();
 		
 		try {
-			processFile("10000x10000.json");
+			processFile("test.json");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
@@ -32,36 +44,61 @@ public class AdjacentCellsChallenge {
 		long duration = (endTime - startTime);
 		
 		System.out.println("Read " + grid.size() * grid.get(0).size() + " grid elements in " + 1.0 * duration / 1000 + " seconds.");
-			
+		
 		updateVisited();
 		
 		startTime = System.currentTimeMillis();
+		
 		findGroups();
+		
 		endTime = System.currentTimeMillis();
 		
 		duration = (endTime - startTime);
 		
 		System.out.println("Gathered groups in " + 1.0 * duration / 1000 + " seconds.");
 		
-		//printGroups();
+		if(answer_one.indexOf("n") >= 0 || answer_one.indexOf("N") >= 0) {
+			
+			System.out.println("Want to print groups? (y/n)");
+			
+			try {
+				answer_two = reader.next();
+	        } catch(InputMismatchException e) {
+	        	System.out.println("Invalid input! So it will not be printed");
+	        	answer_two = "N";
+	        }
+			
+			if(answer_two.indexOf("y") >= 0 || answer_two.indexOf("Y") >= 0) {
+				printGroups();
+			}
+		}	
 	}
 	
 	private static void findGroups() {
+		
+		boolean print = false;
+		
+		if(answer_one.indexOf("y") >= 0 || answer_one.indexOf("Y") >= 0) {
+			print = true;
+		}
 		
 		for(int y = 0; y < grid.size(); y++) {
 			for(int x = 0; x < grid.get(0).size(); x++) {
 				
 				if(!visitedCells[y][x] && grid.get(y).get(x) == '1') {
-					exploring = true;
 					explore(y,x);
 					
 					if(exploredCells.size() > 1) {
-						groups.add((ArrayList<Integer[]>) exploredCells.clone());
+						if(!print) {
+							groups.add((ArrayList<Integer[]>) exploredCells.clone());
+						}
+						else {
+							Collections.reverse(exploredCells);
+							printInstanteGroup(exploredCells);
+						}
 					}
 					
 					exploredCells.clear();
-					
-					exploring = false;
 				}
 			}
 		}
@@ -69,6 +106,21 @@ public class AdjacentCellsChallenge {
 	
 	private static void printCoord(Integer[] coords) {
 		System.out.format("[%d,%d]", coords[0], coords[1]);
+	}
+	
+	private static void printInstanteGroup(ArrayList<Integer[]> group) {
+		
+		System.out.print("[ ");
+		
+		for(int i = 0; i < group.size(); i++) {
+			printCoord(group.get(i));
+			
+			if(i != group.size() - 1) {
+				System.out.print(", ");
+			}
+		}
+		
+		System.out.print(" ]\n");
 	}
 	
 	private static void printGroup(int groupIndex) {
