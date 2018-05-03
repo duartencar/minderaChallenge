@@ -1,46 +1,57 @@
 package minderaChallenge;
-import java.awt.GridBagConstraints;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import org.json.*;
-
 public class AdjacentCellsChallenge {
 	
 	private static ArrayList<ArrayList<Character>> grid = new ArrayList<ArrayList<Character>>();
-	private boolean[][] visitedCells;
+	private static boolean[][] visitedCells;
 	
 	
 
 	public static void main(String[] args) {
 		
+		long startTime = System.currentTimeMillis();
 		
 		try {
-			processFile("100x100.json");
+			processFile("20000x20000.json");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
 		
-		for(ArrayList<Character> list : grid) {
-			for(Character c: list) {
-				System.out.print(c);
+		long endTime = System.currentTimeMillis();
+
+		long duration = (endTime - startTime);
+		
+		System.out.println("Read " + grid.size() * grid.get(0).size() + " grid elements in " + 1.0 * duration / 1000 + " seconds.");
+			
+		updateVisited();
+	}
+	
+	private static void findGroups() {
+		//TODO finds groups and prints them
+	}
+	
+	private static void updateVisited() {
+		visitedCells = new boolean [grid.size()][grid.size()];
+		
+		for(boolean[] line : visitedCells) {
+			for(boolean element : line) {
+				element = false;
 			}
-			
-			System.out.print('\n');
 		}
-			
 	}
 	
 	private static void processFile(String fileName) throws IOException {
 		
 		ArrayList<String> fileContent = readFile(fileName);
 		
-		for(String content: fileContent) {			
-			processLine(content);
+		while(!fileContent.isEmpty()) {			
+			processLine(fileContent.get(0));
+			fileContent.remove(0);
 		}
 	}
 	
