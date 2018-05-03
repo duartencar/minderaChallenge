@@ -22,7 +22,7 @@ public class AdjacentCellsChallenge {
 		long startTime = System.currentTimeMillis();
 		
 		try {
-			processFile("20000x20000.json");
+			processFile("10000x10000.json");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
@@ -38,6 +38,8 @@ public class AdjacentCellsChallenge {
 		startTime = System.currentTimeMillis();
 		findGroups();
 		endTime = System.currentTimeMillis();
+		
+		duration = (endTime - startTime);
 		
 		System.out.println("Gathered groups in " + 1.0 * duration / 1000 + " seconds.");
 		
