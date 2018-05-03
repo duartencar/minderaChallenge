@@ -9,6 +9,8 @@ public class AdjacentCellsChallenge {
 	
 	private static ArrayList<ArrayList<Character>> grid = new ArrayList<ArrayList<Character>>();
 	private static boolean[][] visitedCells;
+	private static ArrayList<Integer[]> exploredCells;
+	private static boolean exploring = false;
 	
 	
 
@@ -32,7 +34,33 @@ public class AdjacentCellsChallenge {
 	}
 	
 	private static void findGroups() {
-		//TODO finds groups and prints them
+		
+		for(int y = 0; y < grid.size(); y++) {
+			for(int x = 0; x < grid.get(0).size(); x++) {
+				
+				if(!visitedCells[y][x] && grid.get(y).get(x) == '1') {
+					exploring = true;
+					explore(y,x);
+				}
+			}
+		}
+	}
+	
+	private static void explore(int y, int x) {
+		visitedCells[y][x] = true;
+		
+		if(!visitedCells[y+1][x] && y+1 < grid.size() && grid.get(y+1).get(x) == '1') {
+			explore(y+1, x);
+		}
+		if(!visitedCells[y-1][x] && y-1 > 0 && grid.get(y-1).get(x) == '1') {
+			explore(y-1, x);
+		}
+		if(!visitedCells[y][x-1] && x-1 > 0 && grid.get(y).get(x-1) == '1') {
+			explore(y, x-1);
+		}
+		if(!visitedCells[y][x+1] && x+1 > grid.size() && grid.get(y).get(x+1) == '1') {
+			explore(y, x+1);
+		}
 	}
 	
 	private static void updateVisited() {
