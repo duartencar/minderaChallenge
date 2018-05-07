@@ -138,7 +138,9 @@ void GroupFinder::freeMemory() {
 	std::free(visited);
 
 	exploredCells.clear();
+	exploredCells.shrink_to_fit();
 
 	groups.clear();
+	groups.shrink_to_fit();
 }
 

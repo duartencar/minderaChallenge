@@ -57,7 +57,7 @@ void insertIntoGroupFinder(GroupFinder *g, std::vector<std::string> cells) {
 void freeMemory(std::vector<std::string> elements) {
 
 	elements.clear();
-	elements.clear();
+	elements.shrink_to_fit();
 }
 
 bool readConfirmation() {
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "Insert file name in parameters!" << std::endl;
 	}
 
-	std::string resourceDir = std::string("./resources/");
+	std::string resourceDir = std::string("../resources/");
 
 	clock_t t = clock();
 
