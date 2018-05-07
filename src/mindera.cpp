@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <sstream>
-#include <stdio.h>
 #include <fstream>
 #include <time.h>
 #include "GroupFinder.h"
@@ -73,10 +71,14 @@ bool readConfirmation() {
     return temp == "Y" || temp == "y";
 }
 
+void printUsage() {
+	std::cout << "Usage:\n\t./minderaChallenge.out [fileName]\n\n\tfileName must be in ../resources/" << std::endl;
+}
+
 int main(int argc, char* argv[]) {
 
 	if(argc != 2) {
-		std::cout << "Insert file name in parameters!" << std::endl;
+		printUsage();
 		return 0;
 	}
 

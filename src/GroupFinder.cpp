@@ -143,4 +143,3 @@ void GroupFinder::freeMemory() {
 	groups.clear();
 	groups.shrink_to_fit();
 }
-
