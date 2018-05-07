@@ -24,7 +24,7 @@ std::vector<std::string> readFile(const std::string fileName) {
 
 	while(std::getline(gridFile, line)) {
 
-		if(line.length() <= 1) {
+		if(line.length() <= 2) {
 			continue;
 		}
 		else {
@@ -36,9 +36,9 @@ std::vector<std::string> readFile(const std::string fileName) {
 			}
 
 			grid.push_back(gridLine);
-
-			gridLine.clear();
 		}
+
+		gridLine.clear();
 	}
 
 	return grid;
@@ -90,7 +90,11 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	std::cout << resourceDir << " read!\n";
+	t = clock() - t;
+
+	std::cout << resourceDir << " read in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
+
+	t = clock();
 
 	GroupFinder *g = new GroupFinder(grid.size(), grid.at(0).size());
 
@@ -98,13 +102,9 @@ int main(int argc, char* argv[]) {
 
 	t = clock() - t;
 
-	std::cout << "File read and processed in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
-
-	freeMemory(grid);
+	std::cout << resourceDir << " processed in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
 
 	t = clock();
-
-	std::cout << "Grid " << g->getLength() << " by " << g->getWidth() << std::endl;
 
 	g->findGroups();
 
@@ -124,5 +124,3 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-
-
