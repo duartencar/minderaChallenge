@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> grid = readFile(resourceDir.append(argv[1]));
 
 	if(grid.size() == 0) {
-		return 0;
+		return 0; 
 	}
 
 	t = clock() - t;
