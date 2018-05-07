@@ -9,49 +9,39 @@
 
 std::vector<std::string> readFile(const std::string fileName) {
 
-	std::vector<std::string> fileLines;
+	std::vector<std::string> grid;
 
 	std::string line;
+
+	std::string gridLine;
 
 	std::ifstream gridFile(fileName);
 
 	if(!gridFile) {
 	    std::cout << "Cannot open input file.\n";
-	    return fileLines;
+	    return grid;
 	  }
 
 	while(std::getline(gridFile, line)) {
-		fileLines.push_back(line);
-	}
 
-	fileLines.erase(fileLines.begin());
-
-	fileLines.erase(fileLines.end());
-
-	return fileLines;
-}
-
-std::vector<std::string> processFileLines(std::vector<std::string> fileLines) {
-
-	std::vector<std::string> cells;
-
-	std::string lineCells;
-
-	for(unsigned y = 0; y < fileLines.size(); y++) {
-
-		lineCells.clear();
-
-		for(char c : fileLines.at(y)) {
-
-			if(c == '1' || c == '0') {
-				lineCells.push_back(c);
-			}
+		if(line.length() <= 1) {
+			continue;
 		}
+		else {
+			for(char c : line) {
 
-		cells.push_back(lineCells);
+				if(c == '1' || c == '0') {
+					gridLine.push_back(c);
+				}
+			}
+
+			grid.push_back(gridLine);
+
+			gridLine.clear();
+		}
 	}
 
-	return cells;
+	return grid;
 }
 
 void insertIntoGroupFinder(GroupFinder *g, std::vector<std::string> cells) {
@@ -86,46 +76,36 @@ bool readConfirmation() {
 int main(int argc, char* argv[]) {
 
 	if(argc != 2) {
-		std::cout << "Insert fileName in parameters!" << std::endl;
+		std::cout << "Insert file name in parameters!" << std::endl;
 	}
 
 	std::string resourceDir = std::string("./resources/");
 
 	clock_t t = clock();
 
-	std::vector<std::string> lines = readFile(resourceDir.append(argv[1]));
+	std::vector<std::string> grid = readFile(resourceDir.append(argv[1]));
 
-	if(lines.size() == 0) {
+	if(grid.size() == 0) {
 		return 0;
 	}
 
-	std::cout << "File read!\n";
+	std::cout << resourceDir << " read!\n";
 
-	std::vector<std::string> processedLines = processFileLines(lines);
+	GroupFinder *g = new GroupFinder(grid.size(), grid.at(0).size());
 
-	freeMemory(lines);
-
-	std::cout << "Lines processed and thrown away!\n";
-
-	GroupFinder *g = new GroupFinder(processedLines.size(), processedLines.at(0).size());
-
-	insertIntoGroupFinder(g, processedLines);
+	insertIntoGroupFinder(g, grid);
 
 	t = clock() - t;
 
 	std::cout << "File read and processed in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
 
-	freeMemory(processedLines);
-
-	std::cout << "Cells inserted and thrown away!\n";
+	freeMemory(grid);
 
 	t = clock();
 
 	std::cout << "Grid " << g->getLength() << " by " << g->getWidth() << std::endl;
 
 	g->findGroups();
-
-	std::cout << "Done!\n";
 
 	t = clock() - t;
 
@@ -137,7 +117,11 @@ int main(int argc, char* argv[]) {
 		g->printGroups();
 	}
 
-	return 0;
+	g->freeMemory();
+
+	std::free(g);
+
+	return 1;
 }
 
 

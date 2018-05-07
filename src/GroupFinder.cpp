@@ -1,10 +1,3 @@
-/*
- * GroupFinder.cpp
- *
- *  Created on: 04/05/2018
- *      Author: Luis Henrique
- */
-
 #include "GroupFinder.h"
 
 GroupFinder::GroupFinder(unsigned length, unsigned width) {
@@ -21,7 +14,6 @@ GroupFinder::GroupFinder(unsigned length, unsigned width) {
 }
 
 GroupFinder::~GroupFinder() {
-	// TODO Auto-generated destructor stub
 }
 
 void GroupFinder::initializeGrids() {
@@ -60,7 +52,7 @@ void GroupFinder::explore(int y, int x) {
 
 	bool hasNeighboor = false;
 
-	if(y+1 < length && grid[y+1][x] == '1') {
+	if(y+1 < (int)length && grid[y+1][x] == '1') {
 		if(!visited[y+1][x]) {
 			explore(y+1, x);
 		}
@@ -81,7 +73,7 @@ void GroupFinder::explore(int y, int x) {
 
 		hasNeighboor = true;
 	}
-	if(x+1 < width && grid[y][x+1] == '1') {
+	if(x+1 < (int)width && grid[y][x+1] == '1') {
 		if(!visited[y][x+1]) {
 			explore(y, x+1);
 		}
@@ -98,8 +90,6 @@ void GroupFinder::explore(int y, int x) {
 }
 
 void GroupFinder::findGroups() {
-
-	std::cout << "Starting search!\n";
 
 	for(unsigned y = 0; y < length; y++) {
 		for(unsigned x = 0; x < width; x++) {
@@ -120,11 +110,11 @@ void GroupFinder::findGroups() {
 
 void GroupFinder::printGroups() {
 
-	for(int i = 0; i < groups.size(); i++) {
+	for(unsigned i = 0; i < groups.size(); i++) {
 
 		std::cout << "[ ";
 
-		int numberOfGroups = groups.at(i).size();
+		unsigned numberOfGroups = groups.at(i).size();
 
 		for(unsigned j = 0; j < numberOfGroups - 1; j++) {
 
@@ -133,11 +123,22 @@ void GroupFinder::printGroups() {
 
 		std::cout << "[" << groups.at(i).at(numberOfGroups-1)[0] << "," << groups.at(i).at(numberOfGroups-1)[1] << "] ]\n";
 	}
+}
 
-	while(groups.size() > 0) {
-		groups.at(0).clear();
-		groups.at(0).shrink_to_fit();
-		groups.erase(groups.begin());
+void GroupFinder::freeMemory() {
+
+	for(unsigned i = 0; i < length; i++) {
+		std::free(grid[i]);
+
+		std::free(visited[i]);
 	}
+
+	std::free(grid);
+
+	std::free(visited);
+
+	exploredCells.clear();
+
+	groups.clear();
 }
 

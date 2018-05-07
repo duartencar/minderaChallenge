@@ -1,10 +1,3 @@
-/*
- * GroupFinder.h
- *
- *  Created on: 04/05/2018
- *      Author: Luis Henrique
- */
-
 #ifndef GROUPFINDER_H_
 #define GROUPFINDER_H_
 
@@ -18,7 +11,6 @@ private:
 	unsigned width;
 	bool **visited;
 	char **grid;
-	int currentCoordinates[2];
 	std::vector<int*> exploredCells;
 	std::vector<std::vector<int*>> groups;
 	void initializeGrids();
@@ -31,6 +23,7 @@ public:
 	unsigned getWidth();
 	void findGroups();
 	void printGroups();
+	void freeMemory();
 };
 
 #endif /* GROUPFINDER_H_ */
