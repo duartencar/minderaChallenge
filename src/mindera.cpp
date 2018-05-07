@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
 
 	if(argc != 2) {
 		std::cout << "Insert file name in parameters!" << std::endl;
+		return 0;
 	}
 
 	std::string resourceDir = std::string("../resources/");
@@ -121,7 +122,7 @@ int main(int argc, char* argv[]) {
 
 	std::free(g);
 
-	return 1;
+	return 0;
 }
 
 
