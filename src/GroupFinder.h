@@ -24,6 +24,7 @@ public:
 	void findGroups();
 	void printGroups();
 	void freeMemory();
+	unsigned numberOfGroups();
 };
 
 #endif /* GROUPFINDER_H_ */

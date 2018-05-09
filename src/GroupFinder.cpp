@@ -8,9 +8,9 @@ GroupFinder::GroupFinder(unsigned length, unsigned width) {
 
 	initializeGrids();
 
-	exploredCells =  std::vector<int*>();
+	exploredCells = std::vector<int*>();
 
-	groups =  std::vector<std::vector<int*>>();
+	groups = std::vector<std::vector<int*>>();
 }
 
 GroupFinder::~GroupFinder() {
@@ -59,14 +59,14 @@ void GroupFinder::explore(int y, int x) {
 
 		hasNeighboor = true;
 	}
-	if(y-1 > 0 && grid[y-1][x] == '1') {
+	if(y-1 >= 0 && grid[y-1][x] == '1') {
 		if(!visited[y-1][x]) {
 			explore(y-1, x);
 		}
 
 		hasNeighboor = true;
 	}
-	if(x-1 > 0 && grid[y][x-1] == '1') {
+	if(x-1 >= 0 && grid[y][x-1] == '1') {
 		if(!visited[y][x-1]) {
 			explore(y, x-1);
 		}
@@ -98,7 +98,7 @@ void GroupFinder::findGroups() {
 
 				explore(y, x);
 
-				if(exploredCells.size() > 1) {
+				if(exploredCells.size() >= 2) {
 					groups.push_back(exploredCells);
 				}
 
@@ -142,4 +142,8 @@ void GroupFinder::freeMemory() {
 
 	groups.clear();
 	groups.shrink_to_fit();
+}
+
+unsigned GroupFinder::numberOfGroups() {
+	return groups.size();
 }

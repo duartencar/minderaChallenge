@@ -19,12 +19,8 @@ bool StreamSolver::neighboorCoords(int * a, int * b) {
 	if(a[1] == b[1] && (a[0] - b[0] == 1 || a[0] - b[0] == -1)) { //same X value
 		return true;
 	}
-	else if(a[0] == b[0] && (a[1] - b[1] == 1 || a[1] - b[1] == -1)) {
-		return true;
-	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 bool StreamSolver::checkIfGroupBelongsToOtherGroup(std::vector<int *> alreadyExisting, std::vector<int *> newGroup) {
@@ -120,14 +116,12 @@ std::vector<std::vector<int *>> StreamSolver::getNeighboorsInLine(std::vector<in
 		coord[0] = y;
 		coord[1] = indexs[i+1];
 
-		if(indexs[i+1] - indexs[i] == 1) {
-			miniGroup.push_back(coord);
-		}
-		else {
+		if(indexs[i+1] - indexs[i] != 1) {
 			groups.push_back(miniGroup);
 			miniGroup.clear();
-			miniGroup.push_back(coord);
 		}
+
+		miniGroup.push_back(coord);
 
 		i++;
 	}
@@ -139,15 +133,21 @@ std::vector<std::vector<int *>> StreamSolver::getNeighboorsInLine(std::vector<in
 	return groups;
 }
 
-void StreamSolver::printGroups() {
-
+void StreamSolver::finalize() {
 	for(std::vector<int *> g : previousLineGroups) {
 		if(g.size() >= 2) {
 			groups.push_back(g);
 		}
 	}
+}
+
+void StreamSolver::printGroups() {
 
 	for(std::vector<int *> g : groups) {
 		printGroup(g);
 	}
+}
+
+unsigned StreamSolver::numberOfGroups() {
+	return groups.size();
 }

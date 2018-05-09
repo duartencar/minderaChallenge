@@ -21,6 +21,8 @@ public:
 	void processLine(std::vector<int> indexs, int y);
 	void printCoord(int * coord);
 	void printGroups();
+	void finalize();
+	unsigned numberOfGroups();
 };
 
 #endif /* STREAMSOLVER_H_ */

@@ -87,27 +87,15 @@ void memoryMode(std::string path) {
 		return;
 	}
 
-	t = clock() - t;
-
-	std::cout << path << " read in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
-
-	t = clock();
-
 	GroupFinder *g = new GroupFinder(grid.size(), grid.at(0).size());
 
 	insertIntoGroupFinder(g, grid);
-
-	t = clock() - t;
-
-	std::cout << path << " processed in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
-
-	t = clock();
 
 	g->findGroups();
 
 	t = clock() - t;
 
-	std::cout << "Groups found in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
+	std::cout << g->numberOfGroups() << " groups found in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
 
 	std::cout << "Want to print groups?";
 
@@ -157,29 +145,22 @@ void streamMode(std::string path) {
 	}
 
 	std::string gridLine;
-	std::string previousLine;
-	std::string currentLine;
-	std::vector<int> previousLineIndexes;
-	std::vector<int> currentLineIndexes;
+	std::vector<int> firstLineIndexes;
 
 	std::getline(gridFile, gridLine); //first line invalid
 	std::getline(gridFile, gridLine);
 
-	previousLine = getCleanLine(gridLine);
+	firstLineIndexes = getIndexesFromLine(getCleanLine(gridLine));
 
-	previousLineIndexes = getIndexesFromLine(previousLine);
-
-	StreamSolver *s = new StreamSolver(previousLineIndexes);
+	StreamSolver *s = new StreamSolver(firstLineIndexes);
 
 	int y = 1;
 
 	clock_t t = clock();
 
 	while(std::getline(gridFile, gridLine)) {
-		if(gridLine.length() <= 2) {
-			continue;
-		}
-		else {
+		if(gridLine.length() > 2) {
+
 			s->processLine(getIndexesFromLine(getCleanLine(gridLine)), y);
 
 			gridLine.clear();
@@ -188,9 +169,11 @@ void streamMode(std::string path) {
 		}
 	}
 
+	s->finalize();
+
 	t = clock() - t;
 
-	std::cout << path << " read, processed and groups calculated in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
+	std::cout << s->numberOfGroups() << " groups found in " << ((float)t)/CLOCKS_PER_SEC << " seconds.\n";
 
 	std::cout << "Want to print groups?";
 
