@@ -2,12 +2,19 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include "LineGroup.h"
 
-StreamSolver::StreamSolver(std::vector<int> firstLineIndexs) {
 
-	previousLineIndexs = firstLineIndexs;
+StreamSolver::StreamSolver(std::vector<LineGroup *> firstLineGroups) {
 
-	previousLineGroups = getNeighboorsInLine(firstLineIndexs, 0);
+	std::vector<LineGroup *> startingGroups;
+
+	for(LineGroup * g : firstLineGroups) {
+		startingGroups = std::vector<LineGroup *>();
+		startingGroups.push_back(g);
+		previousLineGroups.push_back(startingGroups);
+	}
 }
 
 StreamSolver::~StreamSolver() {
@@ -16,29 +23,17 @@ StreamSolver::~StreamSolver() {
 
 bool StreamSolver::neighboorCoords(int * a, int * b) {
 
-	if(a[1] == b[1] && (a[0] - b[0] == 1 || a[0] - b[0] == -1)) { //same X value
-		return true;
-	}
-
 	return false;
 }
 
 bool StreamSolver::checkIfGroupBelongsToOtherGroup(std::vector<int *> alreadyExisting, std::vector<int *> newGroup) {
 
-	for(int * group : alreadyExisting) {
-		for(int * oneOfnew : newGroup) {
-			if(neighboorCoords(group, oneOfnew)) {
-				return true;
-			}
-		}
-	}
-
 	return false;
 }
 
-std::vector<int *> StreamSolver::concatenateGroups(std::vector<int *> toConcatenate, std::vector<int *> concatenated) {
+std::vector<LineGroup *> StreamSolver::concatenateGroups(std::vector<LineGroup *> toConcatenate, std::vector<LineGroup *> concatenated) {
 
-	std::vector<int *> unification;
+	std::vector<LineGroup *> unification;
 
 	unification.reserve(toConcatenate.size() + concatenated.size());
 
@@ -68,83 +63,73 @@ void StreamSolver::printGroup(std::vector<int *> g) {
 	std::cout << " ] \n";
 }
 
-void StreamSolver::processLine(std::vector<int> indexs, int y) {
+void StreamSolver::processLine(std::vector<LineGroup *> lineGroups) {
 
-	std::vector<std::vector<int *>> lineGroups = getNeighboorsInLine(indexs, y);
+	std::vector<std::vector<LineGroup *>> toConcatenate;
 
-	for(unsigned i = 0; i < lineGroups.size(); i++) {
-		for(int j = previousLineGroups.size() - 1; j > -1 ; j--) { //newest groups are in the back
+	for(LineGroup * group : lineGroups) {
 
-			if(checkIfGroupBelongsToOtherGroup(previousLineGroups[j], lineGroups[i])) {
-
-				lineGroups[i] = concatenateGroups(previousLineGroups[j], lineGroups[i]);
-
-				previousLineGroups.erase(previousLineGroups.begin() + j);
-
-				j--;
+		int k = 0;
+		for(std::vector<LineGroup *> previousGroups : previousLineGroups) {
+			if(group->getLineNumber() - previousGroups[previousGroups.size()- 1]->getLineNumber() == 2) {
+				groups.push_back(previousGroups);
+				std::cout << "apaga k= "<< k << std::endl;
+				//previousLineGroups.erase(previousLineGroups.begin() + k);
+				std::cout << "apaga size= " << previousLineGroups.size() << std::endl;
+				k--;
 			}
-		}
-	}
+			else {
+				for(int i = previousGroups.size() - 1; i > -1; i--) {
+					if(previousGroups[i]->nextTo(group)) {
+						toConcatenate.push_back(previousGroups);
+					}
+				}
+			}
 
-	for(std::vector<int *> g : previousLineGroups) {
-		if(g.size() >= 2) {
-			groups.push_back(g);
-		}
-	}
-
-	previousLineGroups.clear();
-
-	for(std::vector<int *> g : lineGroups) {
-		previousLineGroups.push_back(g);
-	}
-}
-
-std::vector<std::vector<int *>> StreamSolver::getNeighboorsInLine(std::vector<int> indexs, int y) {
-	std::vector<std::vector<int *>> groups = std::vector<std::vector<int *>>();
-	std::vector<int *> miniGroup = std::vector<int *>();
-
-	unsigned i = 0;
-
-	int * coord = new int[2];
-	coord[0] = y;
-	coord[1] = indexs.at(0);
-
-	miniGroup.push_back(coord);
-
-	while(i != indexs.size() - 1) {
-		coord = new int[2];
-		coord[0] = y;
-		coord[1] = indexs[i+1];
-
-		if(indexs[i+1] - indexs[i] != 1) {
-			groups.push_back(miniGroup);
-			miniGroup.clear();
+			std::cout << "Incrementa \n";
+			k++;
 		}
 
-		miniGroup.push_back(coord);
+		if(toConcatenate.size() > 0) {
+			std::vector<LineGroup *> newGroup = std::vector<LineGroup *>();
 
-		i++;
+			while(!toConcatenate.empty()) {
+				std::cout << "toConcatenate size     = " << toConcatenate.size() << std::endl;
+				std::cout << "previousLineGroups size= " << previousLineGroups.size() << std::endl;
+				newGroup = concatenateGroups(newGroup, toConcatenate[0]);
+				toConcatenate.erase(toConcatenate.begin());
+				previousLineGroups.erase(find(previousLineGroups.begin(), previousLineGroups.end(), toConcatenate[0]));
+			}
+
+			newGroup.push_back(group);
+
+			previousLineGroups.push_back(newGroup);
+		}
+		else {
+			std::vector<LineGroup *> newGroup = std::vector<LineGroup *>();
+			newGroup.push_back(group);
+			previousLineGroups.push_back(newGroup);
+		}
+
 	}
-
-	if(!miniGroup.empty()) {
-		groups.push_back(miniGroup);
-	}
-
-	return groups;
 }
 
 void StreamSolver::finalize() {
-	for(std::vector<int *> g : previousLineGroups) {
-		if(g.size() >= 2) {
-			groups.push_back(g);
+
+	while(!previousLineGroups.empty()) {
+		if(previousLineGroups[0].size() != 1 || !previousLineGroups[0][0]->isSingle()) {
+			groups.push_back(previousLineGroups[0]);
 		}
+
+		previousLineGroups.erase(previousLineGroups.begin());
 	}
+
 }
 
 void StreamSolver::printGroups() {
 
-	for(std::vector<int *> g : groups) {
-		printGroup(g);
+	for(std::vector<LineGroup *> previousGroups : previousLineGroups) {
+
 	}
 }
 

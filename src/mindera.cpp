@@ -5,6 +5,7 @@
 #include <time.h>
 #include "GroupFinder.h"
 #include "StreamSolver.h"
+#include "LineGroup.h"
 
 std::vector<std::string> readFile(const std::string fileName) {
 
@@ -110,21 +111,48 @@ void memoryMode(std::string path) {
 	return;
 }
 
-std::string getCleanLine(std::string dirtyLine) {
+std::vector<LineGroup *> getLineGroups(std::string dirtyLine, int y) {
 
-	std::string toReturn;
+	std::vector<LineGroup *> lineGroups;
+
+	int x = 0;
+
+	LineGroup *g = NULL;
 
 	for(char c : dirtyLine) {
-		if(c == '1' || c == '0') {
-			toReturn.push_back(c);
+		if(c == '1') {
+			if(g == NULL) {
+				g = new LineGroup(x, y);
+			}
+
+			x++;
+		}
+		if(c == '0') {
+			if(g != NULL) {
+				g->setWidth(x);
+
+				lineGroups.push_back(g);
+
+				g = NULL;
+			}
+
+			x++;
 		}
 	}
 
-	return toReturn;
+	if(g != NULL) {
+		g->setWidth(x);
+
+		lineGroups.push_back(g);
+	}
+
+	return lineGroups;
 }
 
 std::vector<int> getIndexesFromLine(std::string line) {
-	std::vector<int> indexHolder = std::vector<int>();
+
+	std::string processed;
+	std::vector<int> indexHolder;
 
 	for(int x = 0; x < (int)line.length(); x++) {
 		if(line.at(x) == '1') {
@@ -145,28 +173,26 @@ void streamMode(std::string path) {
 	}
 
 	std::string gridLine;
-	std::vector<int> firstLineIndexes;
+	std::vector<LineGroup *> firstLineGroups;
 
 	std::getline(gridFile, gridLine); //first line invalid
 	std::getline(gridFile, gridLine);
 
-	firstLineIndexes = getIndexesFromLine(getCleanLine(gridLine));
+	firstLineGroups = getLineGroups(gridLine, 0);
 
-	StreamSolver *s = new StreamSolver(firstLineIndexes);
+	StreamSolver *s = new StreamSolver(firstLineGroups);
 
 	int y = 1;
 
 	clock_t t = clock();
 
 	while(std::getline(gridFile, gridLine)) {
-		if(gridLine.length() > 2) {
 
-			s->processLine(getIndexesFromLine(getCleanLine(gridLine)), y);
+			s->processLine(getLineGroups(gridLine, y));
 
 			gridLine.clear();
 
 			y++;
-		}
 	}
 
 	s->finalize();
