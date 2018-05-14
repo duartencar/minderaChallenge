@@ -76,6 +76,10 @@ void printUsage() {
 
 void findGroups(std::string path) {
 
+	std::cout << "Want to print groups at end? (uses more memory, but faster)";
+
+	bool print = readConfirmation();
+
 	clock_t t = clock();
 
 	std::vector<std::string> grid = readFile(path);
@@ -85,9 +89,7 @@ void findGroups(std::string path) {
 		return;
 	}
 
-	std::cout << "Want to print groups at end? (uses more memory, but faster)";
-
-	GroupFinder *g = new GroupFinder(grid.size(), grid.at(0).size(), readConfirmation());
+	GroupFinder *g = new GroupFinder(grid.size(), grid.at(0).size(), print);
 
 	insertIntoGroupFinder(g, grid);
 
@@ -104,6 +106,8 @@ void findGroups(std::string path) {
 			g->printGroups();
 		}
 	}
+
+	std::cout << "\nCleaning memory!\n";
 
 	g->freeMemory();
 
