@@ -10,7 +10,7 @@ private:
 	unsigned length;
 	unsigned width;
 	int stringLength;
-	int nGroups;
+	int nGroups = 0;
 	bool printAtEnd;
 	bool **visited;
 	char **grid;
