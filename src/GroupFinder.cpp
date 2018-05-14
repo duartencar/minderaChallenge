@@ -1,12 +1,16 @@
 #include "GroupFinder.h"
 
-GroupFinder::GroupFinder(unsigned length, unsigned width) {
+GroupFinder::GroupFinder(unsigned length, unsigned width, bool printAtEnd) {
 
 	this->length = length;
 
 	this->width = width;
 
+	this->printAtEnd = printAtEnd;
+
 	initializeGrids();
+
+	this->stringLength = getCoordinatesMaxLength();
 
 	exploredCells = std::vector<int*>();
 
@@ -14,6 +18,21 @@ GroupFinder::GroupFinder(unsigned length, unsigned width) {
 }
 
 GroupFinder::~GroupFinder() {
+}
+
+bool GroupFinder::alreadyPrinted() {
+	return !printAtEnd;
+}
+
+int GroupFinder::getCoordinatesMaxLength() {
+
+	char temporary[100];
+
+	int lengthNChars = sprintf(temporary, "%d", length);
+
+	int widthNChars = sprintf(temporary, "%d", width);
+
+	return 5 + lengthNChars + widthNChars;
 }
 
 void GroupFinder::initializeGrids() {
@@ -99,7 +118,15 @@ void GroupFinder::findGroups() {
 				explore(y, x);
 
 				if(exploredCells.size() >= 2) {
-					groups.push_back(exploredCells);
+					if(printAtEnd) {
+						groups.push_back(exploredCells);
+					}
+					else {
+						printGroup(exploredCells);
+						freeGroup(exploredCells);
+					}
+
+					nGroups++;
 				}
 
 				exploredCells.clear();
@@ -108,20 +135,31 @@ void GroupFinder::findGroups() {
 	}
 }
 
+void GroupFinder::printGroup(std::vector<int *> v) {
+	std::string toPrint = "[ ";
+
+	char temporary[this->stringLength];
+
+	for(unsigned j = 0; j < v.size() - 1; j++) {
+		sprintf(temporary, "[%d,%d], ",v[j][1], v[j][0]);
+
+		toPrint.append(temporary);
+	}
+
+	std::cout << toPrint << "[" << v[v.size()-1][1] << "," << v[v.size()-1][0] << "] ]\n";
+}
+
 void GroupFinder::printGroups() {
 
 	for(unsigned i = 0; i < groups.size(); i++) {
+		printGroup(groups.at(i));
+	}
+}
 
-		std::cout << "[ ";
+void GroupFinder::freeGroup(std::vector<int *> trash) {
 
-		unsigned numberOfGroups = groups.at(i).size();
-
-		for(unsigned j = 0; j < numberOfGroups - 1; j++) {
-
-			std::cout << "[" << groups.at(i).at(j)[0] << "," << groups.at(i).at(j)[1] << "], ";
-		}
-
-		std::cout << "[" << groups.at(i).at(numberOfGroups-1)[0] << "," << groups.at(i).at(numberOfGroups-1)[1] << "] ]\n";
+	for(unsigned i = 0; i < trash.size(); i++) {
+		std::free(trash[i]);
 	}
 }
 
@@ -137,13 +175,18 @@ void GroupFinder::freeMemory() {
 
 	std::free(visited);
 
+
+	freeGroup(exploredCells);
 	exploredCells.clear();
 	exploredCells.shrink_to_fit();
 
+	for(unsigned i = 0; i < groups.size(); i++) {
+		freeGroup(groups[i]);
+	}
 	groups.clear();
 	groups.shrink_to_fit();
 }
 
 unsigned GroupFinder::numberOfGroups() {
-	return groups.size();
+	return this->nGroups;
 }
