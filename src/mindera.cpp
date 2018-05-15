@@ -36,7 +36,11 @@ std::vector<std::string> readFile(const std::string fileName) {
 		}
 
 		gridLine.clear();
+
+		line.clear();
 	}
+
+	gridFile.close();
 
 	return grid;
 }
@@ -53,6 +57,10 @@ void insertIntoGroupFinder(GroupFinder *g, std::vector<std::string> cells) {
 
 void freeMemory(std::vector<std::string> elements) {
 
+	for(std::string x : elements) {
+		x.clear();
+		x.shrink_to_fit();
+	}
 	elements.clear();
 	elements.shrink_to_fit();
 }
@@ -92,6 +100,8 @@ void findGroups(std::string path) {
 	GroupFinder *g = new GroupFinder(grid.size(), grid.at(0).size(), print);
 
 	insertIntoGroupFinder(g, grid);
+
+	freeMemory(grid);
 
 	g->findGroups();
 
